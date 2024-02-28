@@ -1,14 +1,9 @@
-package hello.servlet.web.frontcontroller.v3;
+package hello.servlet.web.frontcontroller.v4;
 
-import hello.servlet.web.frontcontroller.ModelView;
 import hello.servlet.web.frontcontroller.MyView;
-import hello.servlet.web.frontcontroller.v2.ControllerV2;
-import hello.servlet.web.frontcontroller.v2.controller.MemberFormControllerV2;
-import hello.servlet.web.frontcontroller.v2.controller.MemberListControllerV2;
-import hello.servlet.web.frontcontroller.v2.controller.MemberSaveControllerV2;
-import hello.servlet.web.frontcontroller.v3.controller.MemberFormControllerV3;
-import hello.servlet.web.frontcontroller.v3.controller.MemberListControllerV3;
-import hello.servlet.web.frontcontroller.v3.controller.MemberSaveControllerV3;
+import hello.servlet.web.frontcontroller.v4.controller.MemberFormControllerV4;
+import hello.servlet.web.frontcontroller.v4.controller.MemberListControllerV4;
+import hello.servlet.web.frontcontroller.v4.controller.MemberSaveControllerV4;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,27 +15,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 // '*': 하위에 들어오는 애들은 다 frontControllerServletV1 생성자가 호출됨
-@WebServlet(name = "frontControllerServletV3", urlPatterns = "/front-controller/v3/*")
+@WebServlet(name = "frontControllerServletV4", urlPatterns = "/front-controller/v4/*")
 
-public class FrontControllerServletV3 extends HttpServlet {
+public class FrontControllerServletV4 extends HttpServlet {
 
-    private Map<String, ControllerV3> controllerMap = new HashMap<>();
+    private Map<String, ControllerV4> controllerMap = new HashMap<>();
 
-    public FrontControllerServletV3() {
-        controllerMap.put("/front-controller/v3/members/new-form", new MemberFormControllerV3());
-        controllerMap.put("/front-controller/v3/members/save", new MemberSaveControllerV3());
-        controllerMap.put("/front-controller/v3/members", new MemberListControllerV3());
+    public FrontControllerServletV4() {
+        controllerMap.put("/front-controller/v4/members/new-form", new MemberFormControllerV4());
+        controllerMap.put("/front-controller/v4/members/save", new MemberSaveControllerV4());
+        controllerMap.put("/front-controller/v4/members", new MemberListControllerV4());
     }
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("FrontControllerServletV3.service");
+        System.out.println("FrontControllerServletV4.service");
 
         // 클라이언트가 입력한 도메인 뒤의 계층을 가져옴
         String requestURI = request.getRequestURI();
 
         // URL 매핑에 맞는 컨트롤러 인스턴스를 가져옴
-        ControllerV3 controller = controllerMap.get(requestURI);
+        ControllerV4 controller = controllerMap.get(requestURI);
         if (controller == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -48,13 +43,11 @@ public class FrontControllerServletV3 extends HttpServlet {
 
         // paramMap
         Map<String, String> paramMap = createParamMap(request);
-        ModelView mv = controller.process(paramMap);
-
-        String viewName = mv.getViewName();// 논리 이름
+        Map<String, Object> model = new HashMap<>(); // 추가
+        String viewName = controller.process(paramMap, model);
 
         MyView view = viewResolver(viewName);
-
-        view.render(mv.getModel(), request, response);
+        view.render(model, request, response);
     }
 
     // *: 논리 이름 -> 물리 이름
