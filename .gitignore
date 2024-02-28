@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### 복습한 파일 제외 ###
+/src/main/java/hello/servlet/web/frontcontroller/v3/
